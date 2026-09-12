@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+
+# Full-resolution generated sources and cutout masters. The trimmed WebP that
+# each episode actually ships lives in its own public/ folder and is committed.
+.raw/
+.cut/
+.cutlocal/
