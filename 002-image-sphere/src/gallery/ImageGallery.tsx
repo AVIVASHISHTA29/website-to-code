@@ -5,6 +5,7 @@ import {
   sphereLayout,
   spiralLayout,
   spiralReach,
+  type Axis,
   type Mode,
   type Point,
 } from "./layouts";
@@ -14,6 +15,12 @@ import "./gallery.css";
 export type ImageGalleryProps = MotionOptions & {
   images: string[];
   mode?: Mode;
+  /**
+   * Which way the axis of the spiral and rings points. Ignored by the sphere.
+   * Vertical stands the thread up as a column you screw through; horizontal
+   * lays it across the screen.
+   */
+  axis?: Axis;
   /** Height of one image, in px. Everything else is sized from this. */
   imageHeight?: number;
   /** Aspect ratio of the images (w / h). The reference used 0.9/1.2. */
@@ -28,19 +35,32 @@ export type ImageGalleryProps = MotionOptions & {
   className?: string;
 };
 
-/** Radius as a multiple of the sphere radius, per arrangement. */
-const SPREAD: Record<Mode, number> = { sphere: 1, spiral: 1.18, rings: 1.18 };
-
 /**
- * Camera distance, as a multiple of that arrangement's radius. The sphere's
- * 3.27 is measured (11.97 / 3.658) and gives the gentle, almost-flat
- * perspective the reference has. The helix needs the camera much closer or it
- * reads as a pile of images rather than a thread you are looking along.
+ * How each arrangement is framed: `spread` is its radius as a multiple of the
+ * sphere's, `camera` its viewing distance as a multiple of that radius.
+ *
+ * The sphere's 3.27 is measured (11.97 / 3.658) and gives the gentle,
+ * almost-flat perspective the reference has. The helix wants the camera much
+ * closer, and a tighter radius — at the sphere's radius it fills the width of
+ * the screen and only a third of a turn is on screen at once, which reads as a
+ * band of images rather than a thread. Narrow it and several turns fit, and it
+ * reads as what it is.
  */
-const CAMERA: Record<Mode, number> = {
-  sphere: SPHERE.cameraPerRadius,
-  spiral: 1.95,
-  rings: 2.5,
+type Frame = { spread: number; camera: number };
+
+const FRAME: Record<Mode, Record<Axis, Frame>> = {
+  sphere: {
+    vertical: { spread: 1, camera: SPHERE.cameraPerRadius },
+    horizontal: { spread: 1, camera: SPHERE.cameraPerRadius },
+  },
+  spiral: {
+    vertical: { spread: 0.62, camera: 1.95 },
+    horizontal: { spread: 0.74, camera: 2.0 },
+  },
+  rings: {
+    vertical: { spread: 0.95, camera: 2.5 },
+    horizontal: { spread: 0.95, camera: 2.5 },
+  },
 };
 
 /** Seen very slightly from above, so rings read as ellipses and not as lines. */
@@ -59,6 +79,7 @@ const RESTING_PITCH = -11;
 export function ImageGallery({
   images,
   mode = "sphere",
+  axis = "vertical",
   imageHeight = 132,
   ratio = 0.75,
   depthFade = 0.18,
@@ -76,8 +97,8 @@ export function ImageGallery({
   // The sphere needs relaxing and the rings need no per-frame work, so both are
   // built once. Only the helix moves under its own power.
   const staticLayouts = useMemo(
-    () => ({ sphere: sphereLayout(n), rings: ringsLayout(n) }),
-    [n],
+    () => ({ sphere: sphereLayout(n), rings: ringsLayout(n, 4, axis) }),
+    [n, axis],
   );
 
   /**
@@ -112,7 +133,7 @@ export function ImageGallery({
     const reach = spiralReach(n);
 
     const layoutFor = (m: Mode, travel: number): Point[] =>
-      m === "spiral" ? spiralLayout(n, travel) : staticLayouts[m];
+      m === "spiral" ? spiralLayout(n, travel, axis) : staticLayouts[m];
 
     const draw = () => {
       const s = motion.current;
@@ -120,8 +141,10 @@ export function ImageGallery({
       const to = layoutFor(s.mode, s.travel);
       // Ease the morph so arrangements settle rather than arrive.
       const t = s.morph >= 1 ? 1 : 1 - Math.pow(1 - s.morph, 3);
-      const spread = SPREAD[s.from] + (SPREAD[s.mode] - SPREAD[s.from]) * t;
-      const cam = CAMERA[s.from] + (CAMERA[s.mode] - CAMERA[s.from]) * t;
+      const a = FRAME[s.from][axis];
+      const b = FRAME[s.mode][axis];
+      const spread = a.spread + (b.spread - a.spread) * t;
+      const cam = a.camera + (b.camera - a.camera) * t;
       if (stage.current) {
         stage.current.style.perspective = `${(radius * spread * cam).toFixed(0)}px`;
       }
@@ -158,7 +181,8 @@ export function ImageGallery({
         if (t > 0.5 && s.mode === "spiral") {
           // Only bite once an image is already leaving the frame, so the
           // wrap is hidden without dimming anything you can actually see.
-          const edge = Math.abs(unit.y) / reach;
+          const along = axis === "vertical" ? unit.y : unit.x;
+          const edge = Math.abs(along) / reach;
           if (edge > 0.86) opacity *= Math.max(0, 1 - (edge - 0.86) / 0.14);
         }
 
@@ -172,7 +196,7 @@ export function ImageGallery({
 
     raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
-  }, [n, radius, depthFade, staticLayouts, motion]);
+  }, [n, radius, depthFade, staticLayouts, motion, axis]);
 
   return (
     <div

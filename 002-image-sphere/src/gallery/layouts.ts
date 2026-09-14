@@ -11,6 +11,22 @@
 
 export type Point = { x: number; y: number; z: number };
 
+/**
+ * Which way the axis of a cylindrical arrangement points.
+ *
+ * "vertical" stands it up the screen — a column you screw up and down through.
+ * "horizontal" lays it across the screen, so the thread runs left to right and
+ * you are looking at the side of it.
+ *
+ * Only spiral and rings have an axis; the sphere ignores it.
+ */
+export type Axis = "vertical" | "horizontal";
+
+/** Lays a Y-axis arrangement over onto the X axis. */
+function onAxis(p: Point, axis: Axis): Point {
+  return axis === "vertical" ? p : { x: p.y, y: p.x, z: p.z };
+}
+
 /** Scene units. Everything below is expressed relative to this. */
 export const UNIT = 1;
 
@@ -110,28 +126,57 @@ export const SPIRAL = {
 } as const;
 
 /**
+ * Whole turns the thread makes before it closes.
+ *
+ * The helix wraps — an image that climbs off the top comes back at the bottom —
+ * and for the thread to actually join up there, n images have to close a whole
+ * number of turns. The measured 12-per-turn only does that when n is a multiple
+ * of 12: at n = 30 you get 2.5 turns, the seam lands half a turn out of phase,
+ * and the spiral visibly breaks into two separate bands.
+ *
+ * So the angular step bends to the nearest whole number of turns instead. The
+ * measured pitch per *turn* is preserved exactly either way; only the images
+ * per turn shift, and not at all when n is a multiple of 12.
+ */
+export function spiralTurns(n: number) {
+  return Math.max(1, Math.round(n / SPIRAL.perTurn));
+}
+
+/** Radians between consecutive images, snapped so the thread closes. */
+export function spiralStep(n: number) {
+  return (Math.PI * 2 * spiralTurns(n)) / n;
+}
+
+/** Rise between consecutive images, keeping pitch-per-turn at the measured value. */
+export function spiralRise(n: number) {
+  return (SPIRAL.pitchPerRadius * spiralTurns(n)) / n;
+}
+
+/**
  * Unit helix: radius 1, rising `pitchPerRadius` per turn, centred on y = 0.
  *
  * `offset` slides the whole thread along its own axis in image-steps — the
- * screw motion the wheel drives. The index wraps modulo n, so an image that
- * climbs off the top reappears at the bottom and the thread is endless. The
- * jump happens at the far ends, which the caller fades out.
+ * screw motion the wheel drives.
  */
-export function spiralLayout(n: number, offset = 0): Point[] {
-  const step = (Math.PI * 2) / SPIRAL.perTurn;
-  const rise = SPIRAL.pitchPerRadius / SPIRAL.perTurn;
+export function spiralLayout(
+  n: number,
+  offset = 0,
+  axis: Axis = "vertical",
+): Point[] {
+  const step = spiralStep(n);
+  const rise = spiralRise(n);
   return Array.from({ length: n }, (_, i) => {
     const k = (((i + offset) % n) + n) % n - n / 2;
     // Angle follows the *unwrapped* index so the thread stays continuous
     // across the seam instead of snapping to a new phase.
     const a = (i + offset) * step;
-    return { x: Math.cos(a), y: k * rise, z: Math.sin(a) };
+    return onAxis({ x: Math.cos(a), y: k * rise, z: Math.sin(a) }, axis);
   });
 }
 
 /** Half-height of the helix — how far an image gets before it wraps. */
 export function spiralReach(n: number) {
-  return (n / 2) * (SPIRAL.pitchPerRadius / SPIRAL.perTurn);
+  return (n / 2) * spiralRise(n);
 }
 
 /* ------------------------------------------------------------------- rings */
@@ -140,7 +185,11 @@ export function spiralReach(n: number) {
  * The other half of k95's own toggle: the same images stacked as flat rings
  * instead of one continuous thread. Same cylinder, no rise within a ring.
  */
-export function ringsLayout(n: number, rings = 4): Point[] {
+export function ringsLayout(
+  n: number,
+  rings = 4,
+  axis: Axis = "vertical",
+): Point[] {
   const per = Math.ceil(n / rings);
   // Tight enough that every ring is on screen at once.
   const gap = SPIRAL.pitchPerRadius / 2.9;
@@ -150,11 +199,14 @@ export function ringsLayout(n: number, rings = 4): Point[] {
     const count = Math.min(per, n - ring * per);
     // Offset alternate rings so they do not line up into vertical columns.
     const a = (within / count) * Math.PI * 2 + (ring % 2 ? Math.PI / count : 0);
-    return {
-      x: Math.cos(a),
-      y: (ring - (rings - 1) / 2) * gap,
-      z: Math.sin(a),
-    };
+    return onAxis(
+      {
+        x: Math.cos(a),
+        y: (ring - (rings - 1) / 2) * gap,
+        z: Math.sin(a),
+      },
+      axis,
+    );
   });
 }
 
@@ -162,6 +214,11 @@ export function ringsLayout(n: number, rings = 4): Point[] {
 
 export const MODES = ["sphere", "spiral", "rings"] as const;
 export type Mode = (typeof MODES)[number];
+
+/** Whether this arrangement has an axis to orient at all. */
+export function hasAxis(mode: Mode) {
+  return mode !== "sphere";
+}
 
 /** Nearest-neighbour coefficient of variation — how evenly spread a set is. */
 export function neighbourCV(points: Point[]) {

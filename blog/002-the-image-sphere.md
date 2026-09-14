@@ -103,11 +103,50 @@ height, consecutive images sit **0.5833** apart vertically and **30.0°** apart
 around the axis. 360 / 30 = 12 images per turn. 12 x 0.5833 = **7.0** of rise
 per revolution, on a cylinder of radius ~5.53.
 
-One honest caveat: my fitted radius oscillated between 5.37 and 5.86 as a smooth
+Two honest caveats. The first: I wrote in my notes that k95's planes billboard
+like the sphere's do. I never checked. I verified identity rotation bases on
+*gionatannese's* quads and carried the assumption across without re-running the
+probe — and looking at k95's own screenshot again, its images clearly skew in
+perspective as they wrap, so they lie on the cylinder wall rather than facing
+you. This rebuild billboards them anyway, which is now a deliberate choice
+rather than something I measured.
+
+The second: my fitted radius oscillated between 5.37 and 5.86 as a smooth
 function of angle, which is the signature of a cylinder axis that isn't quite
 where you think it is — the camera is tilted a few degrees. The radius is
 constant; my axis was slightly off. Worth saying out loud, because a sinusoidal
 error looks exactly like real variation if you don't ask why it's sinusoidal.
+
+## The spiral had a seam, and I shipped it
+
+The first build wrapped the helix the obvious way: take the image index modulo
+n so one that climbs off the top comes back at the bottom. Endless screw, done.
+
+Except it wasn't. The spiral rendered as **two separate diagonal bands with a
+visible gap** — which I looked straight at in a screenshot and read as "a bit
+loose" rather than "broken".
+
+For a helix to actually close on itself, n images have to complete a **whole
+number of turns**. At 12 per turn, 30 images is 2.5 turns. The seam lands half
+a turn out of phase, so the thread restarts on the opposite side of the
+cylinder from where it left off. The angle was continuous and the height
+wrapped, and those two facts only agree when the turns come out whole.
+
+The fix bends the angular step to the nearest whole number of turns rather than
+holding 30° rigidly. The measured **pitch per turn survives exactly** — 1.266
+at every n — and when n *is* a multiple of 12 nothing bends at all:
+
+| n | turns | step | pitch/turn |
+|---|---|---|---|
+| 24 | 2 | **30.000°** | 1.266 |
+| 30 | 3 | 36.000° | 1.266 |
+| 36 | 3 | **30.000°** | 1.266 |
+
+The test is that across every consecutive pair *including across the wrap*
+there is exactly one step value and one rise value. There is.
+
+So the demo uses 36 images instead of 30, which is 3 clean turns at the
+measured 30° with nothing adjusted to make it fit.
 
 ## Then Chrome spent an hour lying to me
 
@@ -178,8 +217,21 @@ cd 002-image-sphere && npm install && npm run dev
 
 `src/gallery/` is self-contained. React, no other dependencies, no WebGL. Drag
 to orbit, scroll to roll the sphere or drive the screw, and the three
-arrangements morph into each other because they are the same 30 points
+arrangements morph into each other because they are the same 36 points
 parameterised three ways.
+
+The spiral and the rings also take an `axis` — vertical stands the thread up as
+a column you screw down through, horizontal lays it across the screen. It costs
+one function:
+
+```ts
+function onAxis(p: Point, axis: Axis): Point {
+  return axis === "vertical" ? p : { x: p.y, y: p.x, z: p.z };
+}
+```
+
+Which is the nice thing about keeping the layouts as pure functions of an
+index: a whole extra orientation is a coordinate swap, not a second code path.
 
 ---
 

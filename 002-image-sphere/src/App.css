@@ -41,6 +41,14 @@
   gap: 16px;
 }
 
+/* The axis switch only exists for arrangements that have an axis, so the
+   footer has to stay balanced whether it is there or not. */
+.modes--axis {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 .mark,
 .hint,
 .count {
@@ -103,7 +111,8 @@
 
 @media (max-width: 700px) {
   .mark,
-  .count {
+  .count,
+  .hint {
     display: none;
   }
   .chrome--top {

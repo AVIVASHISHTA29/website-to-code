@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { ImageGallery } from "./gallery/ImageGallery";
-import { MODES, type Mode } from "./gallery/layouts";
+import { MODES, hasAxis, type Axis, type Mode } from "./gallery/layouts";
 import "./App.css";
 
+/**
+ * 36 images, deliberately: at 12 per turn that is exactly 3 whole turns, so the
+ * helix closes on itself at the measured 30 degrees per image with nothing
+ * bent to make it fit.
+ */
 const IMAGES = Array.from(
-  { length: 30 },
+  { length: 36 },
   (_, i) => `/images/${String(i + 1).padStart(2, "0")}.webp`,
 );
 
@@ -18,6 +23,7 @@ const HINT: Record<Mode, string> = {
 
 export default function App() {
   const [mode, setMode] = useState<Mode>("sphere");
+  const [axis, setAxis] = useState<Axis>("vertical");
   const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
@@ -26,7 +32,12 @@ export default function App() {
 
   return (
     <main className="page">
-      <ImageGallery images={IMAGES} mode={mode} className="page__gallery" />
+      <ImageGallery
+        images={IMAGES}
+        mode={mode}
+        axis={axis}
+        className="page__gallery"
+      />
 
       <header className="chrome chrome--top">
         <span className="mark">Gallery / 3D</span>
@@ -56,6 +67,22 @@ export default function App() {
 
       <footer className="chrome chrome--bottom">
         <p className="hint">{HINT[mode]}</p>
+
+        {hasAxis(mode) && (
+          <div className="modes modes--axis" role="group" aria-label="Axis">
+            {(["vertical", "horizontal"] as const).map((a) => (
+              <button
+                key={a}
+                aria-pressed={a === axis}
+                className={`modes__btn${a === axis ? " is-active" : ""}`}
+                onClick={() => setAxis(a)}
+              >
+                {a}
+              </button>
+            ))}
+          </div>
+        )}
+
         <p className="count">{IMAGES.length} images</p>
       </footer>
     </main>

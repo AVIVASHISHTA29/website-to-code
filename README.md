@@ -15,7 +15,7 @@ I changed and why.
 | # | Interaction | Source | Code | Read |
 |---|---|---|---|---|
 | 001 | Diagonal carousel — objects travelling one shared diagonal, rotating as they go, lights flickering on as they pass centre | [studioloop.com.br](https://www.studioloop.com.br/) | [`001-diagonal-carousel/`](001-diagonal-carousel/) | [blog](blog/001-the-diagonal-carousel.md) |
-| 002 | Image sphere — 3D gallery on a sphere, an endless helix or stacked rings; drag to orbit, scroll to roll or screw | [gionatannese.com](https://www.gionatannese.com/) + [k95.it](https://k95.it/en) | [`002-image-sphere/`](002-image-sphere/) | [blog](blog/002-the-image-sphere.md) |
+| 002 | Image sphere — 3D gallery on a sphere, an endless helix or stacked rings, in either orientation; drag to orbit, scroll to roll or screw | [gionatannese.com](https://www.gionatannese.com/) + [k95.it](https://k95.it/en) | [`002-image-sphere/`](002-image-sphere/) | [blog](blog/002-the-image-sphere.md) |
 
 ## Running an episode
 

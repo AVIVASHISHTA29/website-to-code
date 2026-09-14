@@ -24,6 +24,7 @@ import { ImageGallery } from "./gallery/ImageGallery";
 <ImageGallery
   images={urls}          // any length
   mode="sphere"          // "sphere" | "spiral" | "rings"
+  axis="vertical"        // "vertical" | "horizontal" — spiral and rings only
   imageHeight={132}      // everything else is sized from this
   ratio={0.75}           // image aspect, w / h
   depthFade={0.18}       // how much the back fades. keep it low.
@@ -34,6 +35,7 @@ It fills its positioned parent, so give that parent a size.
 
 | prop | default | |
 |---|---|---|
+| `axis` | `"vertical"` | Which way the spiral/rings axis points. Vertical stands it up as a column you screw through; horizontal lays it across the screen. The sphere ignores it. |
 | `imageHeight` | `132` | Height of one image in px. The radius is `3.05x` this. |
 | `ratio` | `0.75` | Image aspect. The reference used `0.9 / 1.2`. |
 | `depthFade` | `0.18` | Opacity lost at the very back. |
@@ -64,7 +66,10 @@ scale and orientation for one frame.
 | spacing | nearest-neighbour CV **0.024** |
 | wheel | 6.12° per 500px → **0.0122°/px** |
 
-**Helix**, from [k95.it](https://k95.it/en) (which ships its own rings/spiral toggle):
+**Helix**, from [k95.it](https://k95.it/en) (which ships its own rings/spiral toggle).
+Note that only positions were measured here — unlike the sphere, k95's planes are
+*not* billboarded; they lie on the cylinder wall and skew with it. This rebuild
+billboards them anyway, which is a deliberate difference, not a finding:
 
 | | |
 |---|---|
@@ -86,6 +91,28 @@ That takes nearest-neighbour spread from ~25% down to **2.2% at n=18**, against
 the reference's 2.4%. It also works for any n, which the reference's hand-tuned
 18 does not have to.
 
+## Closing the helix
+
+The helix wraps — an image that climbs off one end comes back at the other — and
+for the thread to actually join up there, n images have to close a **whole
+number of turns**. The measured 12-per-turn only does that when n is a multiple
+of 12. At n = 30 you get 2.5 turns, the seam lands half a turn out of phase, and
+the spiral visibly breaks into two separate bands with a gap between them.
+
+So `spiralStep()` bends the angular step to the nearest whole number of turns
+instead. The measured **pitch per turn stays exactly 1.266** either way; only
+the images-per-turn shifts, and not at all when n is a multiple of 12:
+
+| n | turns | step | rise | pitch/turn |
+|---|---|---|---|---|
+| 24 | 2 | **30.000°** | 0.105 | 1.266 |
+| 30 | 3 | 36.000° | 0.127 | 1.266 |
+| 36 | 3 | **30.000°** | 0.105 | 1.266 |
+
+Across every consecutive pair *including the wrap* there is exactly one step
+value and one rise value, which is what makes the thread continuous. The demo
+uses **36** images so it runs at the measured 30° with nothing bent to fit.
+
 ## Two things that will bite you
 
 **Chrome will not decode images whose transform changes every frame.** They
@@ -106,7 +133,7 @@ Adding `will-change` to "help" makes both worse.
 
 ## Assets
 
-The 30 photos in `public/images` are placeholders from
+The 36 photos in `public/images` are placeholders from
 [picsum.photos](https://picsum.photos), which serves photographs from Unsplash
 under the [Unsplash licence](https://unsplash.com/license). Resized to 540x720
 and converted to WebP. Bring your own.
