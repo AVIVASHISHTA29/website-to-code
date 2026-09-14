@@ -18,7 +18,7 @@ export type Point = { x: number; y: number; z: number };
  * "horizontal" lays it across the screen, so the thread runs left to right and
  * you are looking at the side of it.
  *
- * Only spiral and rings have an axis; the sphere ignores it.
+ * Only the spiral has an axis; the sphere ignores it.
  */
 export type Axis = "vertical" | "horizontal";
 
@@ -179,40 +179,9 @@ export function spiralReach(n: number) {
   return (n / 2) * spiralRise(n);
 }
 
-/* ------------------------------------------------------------------- rings */
-
-/**
- * The other half of k95's own toggle: the same images stacked as flat rings
- * instead of one continuous thread. Same cylinder, no rise within a ring.
- */
-export function ringsLayout(
-  n: number,
-  rings = 4,
-  axis: Axis = "vertical",
-): Point[] {
-  const per = Math.ceil(n / rings);
-  // Tight enough that every ring is on screen at once.
-  const gap = SPIRAL.pitchPerRadius / 2.9;
-  return Array.from({ length: n }, (_, i) => {
-    const ring = Math.floor(i / per);
-    const within = i % per;
-    const count = Math.min(per, n - ring * per);
-    // Offset alternate rings so they do not line up into vertical columns.
-    const a = (within / count) * Math.PI * 2 + (ring % 2 ? Math.PI / count : 0);
-    return onAxis(
-      {
-        x: Math.cos(a),
-        y: (ring - (rings - 1) / 2) * gap,
-        z: Math.sin(a),
-      },
-      axis,
-    );
-  });
-}
-
 /* -------------------------------------------------------------------- misc */
 
-export const MODES = ["sphere", "spiral", "rings"] as const;
+export const MODES = ["sphere", "spiral"] as const;
 export type Mode = (typeof MODES)[number];
 
 /** Whether this arrangement has an axis to orient at all. */

@@ -1,8 +1,9 @@
 # Image Sphere
 
-Images arranged in 3D on a **sphere**, an endless **helix**, or stacked **rings**
-— drag to orbit, scroll to roll the ball or drive the screw, and morph between
-the three. Light and dark.
+Images arranged in 3D on a **sphere** or an endless **helix** — drag to orbit,
+scroll to roll the ball or drive the screw, and morph between the two. The helix
+runs vertically as a column you screw through, or horizontally across the
+screen. Light and dark.
 
 No WebGL and no dependencies beyond React. Both references billboard their
 images — every plane always faces the camera and never turns — and that is
@@ -23,8 +24,8 @@ import { ImageGallery } from "./gallery/ImageGallery";
 
 <ImageGallery
   images={urls}          // any length
-  mode="sphere"          // "sphere" | "spiral" | "rings"
-  axis="vertical"        // "vertical" | "horizontal" — spiral and rings only
+  mode="sphere"          // "sphere" | "spiral"
+  axis="vertical"        // "vertical" | "horizontal" — spiral only
   imageHeight={132}      // everything else is sized from this
   ratio={0.75}           // image aspect, w / h
   depthFade={0.18}       // how much the back fades. keep it low.
@@ -35,7 +36,7 @@ It fills its positioned parent, so give that parent a size.
 
 | prop | default | |
 |---|---|---|
-| `axis` | `"vertical"` | Which way the spiral/rings axis points. Vertical stands it up as a column you screw through; horizontal lays it across the screen. The sphere ignores it. |
+| `axis` | `"vertical"` | Which way the helix axis points. Vertical stands it up as a column you screw through; horizontal lays it across the screen. The sphere ignores it. |
 | `imageHeight` | `132` | Height of one image in px. The radius is `3.05x` this. |
 | `ratio` | `0.75` | Image aspect. The reference used `0.9 / 1.2`. |
 | `depthFade` | `0.18` | Opacity lost at the very back. |
@@ -66,7 +67,7 @@ scale and orientation for one frame.
 | spacing | nearest-neighbour CV **0.024** |
 | wheel | 6.12° per 500px → **0.0122°/px** |
 
-**Helix**, from [k95.it](https://k95.it/en) (which ships its own rings/spiral toggle).
+**Helix**, from [k95.it](https://k95.it/en) (whose own header offers it as one of two arrangements).
 Note that only positions were measured here — unlike the sphere, k95's planes are
 *not* billboarded; they lie on the cylinder wall and skew with it. This rebuild
 billboards them anyway, which is a deliberate difference, not a finding:

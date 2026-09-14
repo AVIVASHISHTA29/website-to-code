@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   SPHERE,
-  ringsLayout,
   sphereLayout,
   spiralLayout,
   spiralReach,
@@ -16,9 +15,9 @@ export type ImageGalleryProps = MotionOptions & {
   images: string[];
   mode?: Mode;
   /**
-   * Which way the axis of the spiral and rings points. Ignored by the sphere.
-   * Vertical stands the thread up as a column you screw through; horizontal
-   * lays it across the screen.
+   * Which way the spiral's axis points. Ignored by the sphere. Vertical stands
+   * the thread up as a column you screw through; horizontal lays it across the
+   * screen.
    */
   axis?: Axis;
   /** Height of one image, in px. Everything else is sized from this. */
@@ -57,18 +56,15 @@ const FRAME: Record<Mode, Record<Axis, Frame>> = {
     vertical: { spread: 0.62, camera: 1.95 },
     horizontal: { spread: 0.74, camera: 2.0 },
   },
-  rings: {
-    vertical: { spread: 0.95, camera: 2.5 },
-    horizontal: { spread: 0.95, camera: 2.5 },
-  },
 };
 
-/** Seen very slightly from above, so rings read as ellipses and not as lines. */
+/** Seen very slightly from above, so the arrangement reads as a solid rather
+ * than a flat disc edge-on. */
 const RESTING_PITCH = -11;
 
 /**
- * Images arranged on a sphere, an endless helix, or stacked rings — drag to
- * orbit, wheel to roll the ball or drive the screw.
+ * Images arranged on a sphere or an endless helix — drag to orbit, wheel to
+ * roll the ball or drive the screw.
  *
  * There is no WebGL here. Both references billboard their images, meaning every
  * plane always faces the camera and never turns, and that is exactly what a
@@ -94,12 +90,9 @@ export function ImageGallery({
 
   const radius = imageHeight * SPHERE.radiusPerImageHeight;
 
-  // The sphere needs relaxing and the rings need no per-frame work, so both are
-  // built once. Only the helix moves under its own power.
-  const staticLayouts = useMemo(
-    () => ({ sphere: sphereLayout(n), rings: ringsLayout(n, 4, axis) }),
-    [n, axis],
-  );
+  // The sphere is relaxed once and then never changes. Only the helix moves
+  // under its own power, so only it is rebuilt per frame.
+  const staticLayouts = useMemo(() => ({ sphere: sphereLayout(n) }), [n]);
 
   /**
    * Decode every image before showing any of them.

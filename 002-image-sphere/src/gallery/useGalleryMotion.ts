@@ -5,8 +5,8 @@ export type MotionOptions = {
   /** Degrees of rotation per pixel dragged. */
   dragSpeed?: number;
   /**
-   * Degrees of roll per pixel of wheel, in sphere and rings modes. Measured on
-   * the reference at 6.12 degrees per 500px, i.e. 0.0122.
+   * Degrees of roll per pixel of wheel, in sphere mode. Measured on the
+   * reference at 6.12 degrees per 500px, i.e. 0.0122.
    */
   wheelSpin?: number;
   /** Images travelled per 100px of wheel, in spiral mode. */
@@ -39,8 +39,8 @@ const prefersReducedMotion = () =>
  *
  * Drag always orbits. What the wheel does depends on the arrangement: on the
  * sphere it rolls the whole ball around the view axis, on the helix it drives
- * you along the thread like a screw, on the rings it spins them. That is the
- * only place the modes differ — everything else is the same motion.
+ * you along the thread like a screw. That is the only place the two modes
+ * differ — everything else is the same motion.
  *
  * Values are exposed through a ref rather than state: the gallery writes
  * transforms straight to the DOM each frame, so re-rendering 30 React

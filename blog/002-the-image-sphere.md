@@ -94,9 +94,9 @@ iterations — takes the spread from ~25% down to **2.2% at n=18**. Against thei
 
 ## The helix, which was polite about it
 
-k95 ships a **RINGS / SPIRAL** toggle in its own header, which is a nice
-confirmation that "give it two or three arrangements" is a real design and not
-something I invented.
+k95 offers its spiral as one of two arrangements in its own header, which is a
+nice confirmation that "let the same images take more than one shape" is a real
+design and not something I invented.
 
 Same instrumentation, and the numbers are almost suspiciously round. Sorted by
 height, consecutive images sit **0.5833** apart vertically and **30.0°** apart
@@ -216,13 +216,12 @@ cd 002-image-sphere && npm install && npm run dev
 ```
 
 `src/gallery/` is self-contained. React, no other dependencies, no WebGL. Drag
-to orbit, scroll to roll the sphere or drive the screw, and the three
+to orbit, scroll to roll the sphere or drive the screw, and the two
 arrangements morph into each other because they are the same 36 points
-parameterised three ways.
+parameterised two ways.
 
-The spiral and the rings also take an `axis` — vertical stands the thread up as
-a column you screw down through, horizontal lays it across the screen. It costs
-one function:
+The spiral also takes an `axis` — vertical stands the thread up as a column you
+screw down through, horizontal lays it across the screen. It costs one function:
 
 ```ts
 function onAxis(p: Point, axis: Axis): Point {
@@ -266,7 +265,7 @@ index: a whole extra orientation is a coordinate swap, not a second code path.
 > whose transform changes every frame. Four lines to fix. Story's in the repo.
 >
 > Second site (@k95) had a spiral: exactly 30° and 0.5833 of rise between
-> images. 12 per turn. Both modes are in the build.
+> images. 12 per turn. Both shapes are in the build, and they morph.
 >
 > Code in the repo — link in bio.
 >
@@ -282,5 +281,5 @@ index: a whole extra orientation is a coordinate swap, not a second code path.
 6. "So: no WebGL." The CSS `translate3d` version side by side
 7. The blank white cards + `{ loaded: 30, broken: 0 }`
 8. The red-background test — 15 red rectangles
-9. Fixed, all three modes morphing, light → dark
+9. Fixed, both arrangements morphing, light → dark
 10. Repo + "what should I pull apart next?"

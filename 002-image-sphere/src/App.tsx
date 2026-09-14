@@ -18,7 +18,6 @@ type Theme = "light" | "dark";
 const HINT: Record<Mode, string> = {
   sphere: "Drag to orbit · scroll to roll",
   spiral: "Drag to orbit · scroll to travel",
-  rings: "Drag to orbit · scroll to spin",
 };
 
 export default function App() {
