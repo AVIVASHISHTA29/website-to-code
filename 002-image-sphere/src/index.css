@@ -1,0 +1,45 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap");
+
+:root {
+  --bg: #f4f4f2;
+  --ink: #101010;
+  --ink-dim: rgba(16, 16, 16, 0.5);
+  --line: rgba(16, 16, 16, 0.14);
+  --panel: rgba(255, 255, 255, 0.6);
+  --ig-shadow: 0 14px 34px rgba(0, 0, 0, 0.16);
+  --ig-placeholder: rgba(0, 0, 0, 0.06);
+
+  color-scheme: light;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+:root[data-theme="dark"] {
+  --bg: #08080a;
+  --ink: #f2f2f0;
+  --ink-dim: rgba(242, 242, 240, 0.5);
+  --line: rgba(242, 242, 240, 0.16);
+  --panel: rgba(255, 255, 255, 0.05);
+  /* A dark ground kills a drop shadow, so the images get a soft rim instead. */
+  --ig-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 18px 40px rgba(0, 0, 0, 0.6);
+  --ig-placeholder: rgba(255, 255, 255, 0.06);
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  overscroll-behavior: none;
+}

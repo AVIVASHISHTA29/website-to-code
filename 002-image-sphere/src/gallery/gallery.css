@@ -1,0 +1,58 @@
+.ig-surface {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+.ig-surface.is-dragging {
+  cursor: grabbing;
+}
+
+/*
+ * Perspective sits here, on the images' direct parent, and the stage stays a
+ * flat rendering context.
+ *
+ * The obvious alternative — `transform-style: preserve-3d` so the browser
+ * depth-sorts for you — puts all N images into one 3D rendering context, and
+ * past a couple of dozen layers Chrome stops rastering most of them: the
+ * box-shadows still paint, so you get correctly-placed blank cards. Since
+ * every image is billboarded anyway, there is no real 3D orientation to
+ * preserve, and sorting by z into `zIndex` costs one line in the draw loop.
+ *
+ * The distance itself is written from JS — it is derived from the image size
+ * and changes with the arrangement.
+ */
+.ig-stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform-style: flat;
+}
+
+.ig-item {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  /* Placed by its own centre, so the layout maths deals in centres.
+     `translate` is a separate property, so it composes with the `transform`
+     the animation loop writes every frame instead of fighting it. */
+  translate: -50% -50%;
+}
+
+.ig-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+  background: var(--ig-placeholder, rgba(128, 128, 128, 0.12));
+  box-shadow: var(--ig-shadow, 0 12px 30px rgba(0, 0, 0, 0.18));
+}
+

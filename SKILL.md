@@ -67,6 +67,42 @@ Now look for the constant. Take differences between consecutive rows. In 001 the
 x/y deltas were `(285, 195)` for every single pair and the rotation delta was
 exactly `15°` — which is the entire interaction, in two numbers.
 
+### When there is no DOM
+
+If the page renders to a `<canvas>`, none of the above exists — the geometry
+lives in a closure as numbers. Walking the React fiber for the scene usually
+fails, and the Three.js devtools hook has to be installed before the bundle
+runs, which is too late by the time you can execute anything.
+
+Instrument the draw calls instead. Every frame the page has to tell the GPU
+where everything is:
+
+```js
+const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+const orig = gl.drawElements.bind(gl);
+gl.drawElements = function (...args) {
+  const program = gl.getParameter(gl.CURRENT_PROGRAM);
+  const loc = gl.getUniformLocation(program, 'modelViewMatrix');
+  if (loc) rows.push(Array.from(gl.getUniform(program, loc)));
+  return orig(...args);
+};
+// ...one frame later, restore gl.drawElements
+```
+
+- **Enumerate the uniforms first** (`getProgramParameter(p, gl.ACTIVE_UNIFORMS)`
+  then `getActiveUniform`). Asking for `modelMatrix` and getting nothing means
+  the material does not have one, not that the site uses instancing —
+  `MeshBasicMaterial` only gets `modelViewMatrix` and `projectionMatrix`.
+- **Also wrap `drawArrays` and the `*Instanced` variants**, and count which
+  ones actually fire.
+- Decompose each matrix: elements 12-14 are the position, the lengths of the
+  first three columns are the scale, and the normalised columns are the
+  rotation. **A rotation basis of exact identity in camera space means the
+  thing billboards** — it always faces the viewer and never turns, which often
+  means you can rebuild it in CSS with no WebGL at all.
+- Deduplicate, then **cluster by proximity**: objects are frequently drawn more
+  than once, as coplanar quads a few thousandths apart.
+
 Things worth checking while you are in there:
 
 - **Scroll to 0 and wait before sampling.** Mid-animation values are noise; the
@@ -128,6 +164,28 @@ at it.
 - Honour `prefers-reduced-motion` for anything that moves on its own.
 
 Do the demo page after the component works, not before.
+
+### Two Chrome behaviours that will cost you an hour each
+
+Both present identically: elements correctly positioned and sized, box-shadows
+painting, and **nothing inside them**. Every diagnostic says the images are
+fine (`complete: true`, a real `naturalWidth`, HTTP 200).
+
+- **Chrome defers decoding images whose transform changes every frame**, and
+  under continuous animation it defers forever. `await img.decode()` on every
+  image before the loop starts.
+- **`transform-style: preserve-3d` does not scale.** It is the obvious way to
+  get depth sorting for free, but it puts every element into one 3D rendering
+  context and past a couple of dozen layers Chrome stops rastering most of
+  them. If the things billboard, there is no orientation to preserve: keep the
+  stage flat, put the perspective on the direct parent, and sort by z into
+  `zIndex` yourself.
+
+Adding `will-change` to "help" makes both of them worse.
+
+The test that separates these from everything else: **force a solid background
+colour onto the elements.** If they light up, they are painting and it is the
+content specifically that is not.
 
 ## 6. Prove it matches
 

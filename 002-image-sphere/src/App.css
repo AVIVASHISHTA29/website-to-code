@@ -1,0 +1,116 @@
+.page {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg);
+  transition: background 0.5s ease;
+}
+
+.page__gallery {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.chrome {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  /* The gallery owns every pointer event; only the controls opt back in. */
+  pointer-events: none;
+  padding: 22px clamp(16px, 3.5vw, 42px);
+  color: var(--ink);
+}
+
+.chrome > *,
+.chrome button {
+  pointer-events: auto;
+}
+
+.chrome--top {
+  inset: 0 0 auto 0;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.chrome--bottom {
+  inset: auto 0 0 0;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.mark,
+.hint,
+.count {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.modes {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  backdrop-filter: blur(10px);
+}
+
+.modes__btn {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 7px 16px;
+  background: transparent;
+  color: var(--ink-dim);
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.25s ease, background 0.25s ease;
+}
+
+.modes__btn:hover {
+  color: var(--ink);
+}
+
+.modes__btn.is-active {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.theme {
+  appearance: none;
+  min-width: 70px;
+  padding: 8px 15px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  backdrop-filter: blur(10px);
+  color: var(--ink);
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  .mark,
+  .count {
+    display: none;
+  }
+  .chrome--top {
+    justify-content: center;
+  }
+  .theme {
+    position: absolute;
+    right: clamp(16px, 3.5vw, 42px);
+  }
+}
