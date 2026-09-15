@@ -95,7 +95,7 @@ export interface BlobConfig {
 
   /** Point size in pixels at unit distance. */
   pointSize: number
-  /** Particle colour, `#rrggbb`. */
+  /** Particle colour, `#rrggbb`. Light on dark by default. */
   color: string
   /** Page/background colour behind the blob, `#rrggbb`. */
   background: string
@@ -152,12 +152,12 @@ export const DEFAULT_CONFIG: BlobConfig = {
   curlFrequency: 0.05,
   timeScale: 1,
   scale: 1,
-  pointSize: 1.0,
-  color: '#1a1a1a',
-  background: '#f7f7f8',
+  pointSize: 1.1,
+  color: '#e6ebf5',
+  background: '#0b0c10',
   rimIntensity: 0,
   softSprites: 0,
-  opacity: 0.35,
+  opacity: 0.4,
   mouseMode: 'repel',
   mouseIntensity: 0.2,
   mouseRadius: 1.2,

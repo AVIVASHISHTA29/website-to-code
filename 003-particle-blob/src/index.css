@@ -55,7 +55,9 @@ body {
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
-  background: #f7f7f8;
+  /* Matches DEFAULT_CONFIG.background, so there is no white flash before the
+     first frame lands. */
+  background: #0b0c10;
 }
 
 .studio {

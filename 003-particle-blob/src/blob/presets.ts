@@ -77,18 +77,18 @@ export const PRESETS: Preset[] = [
     noiseAmount: 0.4,
     lockShell: 0.3,
   }),
-  // Glass needs something with contrast behind it. A pale cloud on a pale page
-  // refracts to more pale page, and the shell vanishes entirely — so this one
-  // runs darker and denser than the measured presets do.
+  // Glass needs contrast behind it. A pale cloud on a pale page refracts to
+  // more pale page and the shell disappears, so both glass presets run a dense
+  // cloud against a dark ground.
   from('ours: frosted glass shell over a calm cloud', 'Liquid glass', {
     glass: true,
     noiseAmount: 0.22,
     lockShell: 0.45,
     curlAmount: 0.3,
     curlFrequency: 0.5,
-    background: '#eceff5',
-    color: '#141c33',
-    opacity: 0.8,
+    background: '#101422',
+    color: '#dce6ff',
+    opacity: 0.85,
     pointSize: 2.1,
     glassRadius: 0.84,
     glassRefraction: 0.45,

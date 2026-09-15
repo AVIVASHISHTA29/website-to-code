@@ -56,12 +56,12 @@ lives — `ORGANIC → CORONA` at 0.3 is a different object from either end.
 |---|---|---|
 | `count` | `30000` | Points per layer |
 | `layers` | `3` | Stacked shells |
-| `pointSize` | `1.0` | Point size in CSS pixels at the centre |
-| `opacity` | `0.35` | Base particle alpha |
+| `pointSize` | `1.1` | Point size in CSS pixels at the centre |
+| `opacity` | `0.4` | Base particle alpha |
 | `softSprites` | `0` | 0 = hard dot, 1 = soft sprite |
 | `rimIntensity` | `0` | Fresnel brightening at the silhouette |
-| `color` | `'#1a1a1a'` | Particle colour |
-| `background` | `'#f7f7f8'` | Page colour behind the blob |
+| `color` | `'#e6ebf5'` | Particle colour |
+| `background` | `'#0b0c10'` | Page colour behind the blob |
 
 ### Motion and interaction
 
@@ -142,6 +142,11 @@ Ours, and deliberately different:
   direct keeps the folder dependency-free.
 
 ## Notes
+
+The blob defaults to light particles on a near-black page. The studio's own
+chrome follows `background` rather than the OS theme — the canvas fills the
+screen, so a light blob under a dark system theme would otherwise paint
+near-white labels onto a near-white page.
 
 `prefers-reduced-motion: reduce` freezes the blob completely — no spin, no
 breathing, no cursor response. That is deliberate, but it does mean the
