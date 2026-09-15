@@ -1,0 +1,63 @@
+/*
+ * Studio tokens. The theme follows the blob's own background colour, not the
+ * OS: the canvas fills the screen, so a light blob under a dark system theme
+ * would otherwise paint near-white text onto a near-white page.
+ * `data-theme` is set in App.tsx from the background's luminance.
+ */
+.studio,
+.studio[data-theme='light'] {
+  --panel: rgba(255, 255, 255, 0.55);
+  --panel-border: rgba(255, 255, 255, 0.75);
+  --panel-shadow: 0 20px 60px rgba(15, 20, 35, 0.16);
+  --panel-contrast: #ffffff;
+  --ink: #171a20;
+  --ink-soft: #5c6473;
+  --ink-faint: #949cab;
+  --accent: #2f6bff;
+  --track: rgba(23, 26, 32, 0.12);
+  --chip: rgba(255, 255, 255, 0.6);
+  --chip-active: #171a20;
+  --chip-active-ink: #ffffff;
+}
+
+.studio[data-theme='dark'] {
+  --panel: rgba(22, 24, 30, 0.6);
+  --panel-border: rgba(255, 255, 255, 0.12);
+  --panel-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  --panel-contrast: #0c0d10;
+  --ink: #f2f4f8;
+  --ink-soft: #a7aebc;
+  --ink-faint: #6d7585;
+  --accent: #6ea8ff;
+  --track: rgba(255, 255, 255, 0.14);
+  --chip: rgba(255, 255, 255, 0.08);
+  --chip-active: #f2f4f8;
+  --chip-active-ink: #0c0d10;
+}
+
+:root {
+  --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  background: #f7f7f8;
+}
+
+.studio {
+  color: var(--ink);
+}
